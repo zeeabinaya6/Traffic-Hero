@@ -1,0 +1,6 @@
+{
+  "name": "Traffic Hero - Game Edukasi Keselamatan Lalu Lintas",
+  "description": "Game arcade 2D edukasi keselamatan lalu lintas untuk menyeberang jalan dengan aman, mematuhi lampu lalu lintas, dan menghindari kendaraan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
