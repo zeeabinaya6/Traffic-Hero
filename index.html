@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Traffic Hero - Game Edukasi Keselamatan Lalu Lintas</title>
+    <meta name="description" content="Game arcade 2D edukasi keselamatan lalu lintas untuk menyeberang jalan dengan aman, mematuhi lampu lalu lintas, dan menghindari kendaraan." />
+    <meta property="og:title" content="Traffic Hero - Game Edukasi Keselamatan Lalu Lintas" />
+    <meta property="og:description" content="Game arcade 2D edukasi keselamatan lalu lintas untuk menyeberang jalan dengan aman, mematuhi lampu lalu lintas, dan menghindari kendaraan." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Game Container -->
+    <div id="game-app">
+      <!-- Main Game Header / Topbar -->
+      <header id="game-header">
+        <div class="brand">
+          <span class="traffic-light-icon">🚦</span>
+          <span class="brand-title">TRAFFIC HERO</span>
+        </div>
+        <div class="header-controls">
+          <button id="btn-sound-toggle" class="icon-btn" title="Nyalakan/Matikan Suara">
+            <span id="sound-icon">🔊</span>
+          </button>
+          <button id="btn-pause" class="icon-btn hidden" title="Jeda Permainan (P / Esc)">
+            <span id="pause-icon">⏸️</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- In-Game HUD -->
+      <div id="game-hud" class="hud hidden">
+        <div class="hud-item score-box">
+          <span class="hud-label">SKOR</span>
+          <span id="hud-score" class="hud-value">0</span>
+        </div>
+        <div class="hud-item level-box">
+          <span class="hud-label">LEVEL</span>
+          <span id="hud-level" class="hud-value">1 / 3</span>
+        </div>
+        <div class="hud-item lives-box">
+          <span class="hud-label">NYAWA</span>
+          <div id="hud-lives" class="lives-container">
+            <span class="heart active">❤️</span>
+            <span class="heart active">❤️</span>
+            <span class="heart active">❤️</span>
+          </div>
+        </div>
+        <div class="hud-item signal-box">
+          <span class="hud-label">LAMPU PEJALAN</span>
+          <div id="ped-signal-badge" class="ped-signal red">
+            <span id="ped-signal-icon">🛑</span>
+            <span id="ped-signal-text">TUNGGU</span>
+            <span id="ped-signal-timer">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Educational Tip Banner -->
+      <div id="edu-banner" class="edu-banner hidden">
+        <span class="edu-icon">💡</span>
+        <span id="edu-text" class="edu-text">Gunakan zebra crossing untuk menyeberang dengan aman.</span>
+      </div>
+
+      <!-- Main Canvas Screen Area -->
+      <div id="canvas-wrapper">
+        <canvas id="gameCanvas" width="960" height="600"></canvas>
+
+        <!-- UI Overlays inside canvas area -->
+
+        <!-- 1. Menu Awal (Start Screen) -->
+        <div id="screen-menu" class="overlay-screen active">
+          <div class="menu-card">
+            <div class="badge-tag">GAME EDUKASI KESELAMATAN JALAN</div>
+            <div class="title-container">
+              <h1 class="game-title">
+                <span class="title-traffic">TRAFFIC</span>
+                <span class="title-hero">HERO</span>
+              </h1>
+              <p class="game-subtitle">Be Safe, Be Smart!</p>
+            </div>
+
+            <div class="menu-mascot-container">
+              <div class="character-preview">
+                <div class="mascot-avatar">🚶‍♂️</div>
+                <div class="mascot-crosswalk"></div>
+              </div>
+            </div>
+
+            <div class="menu-actions">
+              <button id="btn-start" class="btn btn-primary btn-large">
+                <span class="btn-icon">▶</span> START GAME
+              </button>
+              <button id="btn-how-to-play" class="btn btn-secondary">
+                <span class="btn-icon">📖</span> CARA BERMAIN
+              </button>
+            </div>
+
+            <div class="menu-footer">
+              <div class="high-score-tag">
+                🏆 Skor Tertinggi: <span id="menu-high-score">0</span>
+              </div>
+              <div class="device-hint">
+                ⌨️ Gunakan Keyboard (Arrow Keys atau W A S D)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. How To Play Modal (Panduan Bermain) -->
+        <div id="modal-how-to-play" class="modal-overlay hidden">
+          <div class="modal-card">
+            <div class="modal-header">
+              <h2>📖 Panduan Bermain Traffic Hero</h2>
+              <button id="btn-close-how" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="guide-grid">
+                <div class="guide-item">
+                  <div class="guide-icon">🎮</div>
+                  <div class="guide-info">
+                    <h4>Kontrol Karakter</h4>
+                    <p>Gunakan tombol <strong>Arrow (Panah)</strong> atau <strong>W, A, S, D</strong> untuk bergerak ke atas, bawah, kiri, dan kanan.</p>
+                  </div>
+                </div>
+
+                <div class="guide-item">
+                  <div class="guide-icon">🏁</div>
+                  <div class="guide-info">
+                    <h4>Tujuan Utama</h4>
+                    <p>Bawa karakter menyeberangi jalan dari trotoar bawah hingga mencapai <strong>Area Finish Hijau</strong> di trotoar atas dengan selamat.</p>
+                  </div>
+                </div>
+
+                <div class="guide-item">
+                  <div class="guide-icon">🦓</div>
+                  <div class="guide-info">
+                    <h4>Gunakan Zebra Crossing</h4>
+                    <p>Menyeberanglah selalu di jalur <strong>Zebra Crossing</strong>. Menyeberang dengan benar memberikan <strong>+10 poin</strong>!</p>
+                  </div>
+                </div>
+
+                <div class="guide-item">
+                  <div class="guide-icon">🚦</div>
+                  <div class="guide-info">
+                    <h4>Patuhi Lampu Lalu Lintas</h4>
+                    <p>Saat lampu kendaraan <strong>Merah</strong> (Lampu pejalan <strong>Hijau</strong>), kendaraan berhenti dan kamu aman menyeberang. Jangan menyeberang saat lampu kendaraan hijau!</p>
+                  </div>
+                </div>
+
+                <div class="guide-item">
+                  <div class="guide-icon">🚗</div>
+                  <div class="guide-info">
+                    <h4>Waspadai Kendaraan</h4>
+                    <p>Hindari Mobil, Motor berkecepatan tinggi, dan Bus panjang. Tertabrak akan mengurangi <strong>1 Nyawa</strong> dan <strong>-20 Poin</strong>.</p>
+                  </div>
+                </div>
+
+                <div class="guide-item">
+                  <div class="guide-icon">⭐</div>
+                  <div class="guide-info">
+                    <h4>Sistem Skor & Bonus</h4>
+                    <p>Capai Finish: <strong>+100 Poin</strong>. Selesaikan level tanpa tertabrak sama sekali: <strong>Bonus +50 Poin</strong>!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button id="btn-start-from-guide" class="btn btn-primary">
+                SAYA MENGERTI, AYO MAIN!
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Pause Screen -->
+        <div id="screen-pause" class="overlay-screen hidden">
+          <div class="pause-card">
+            <h2>⏸️ PERMAINAN DI-JEDA</h2>
+            <p>Istirahat sejenak sambil mengingat aturan keselamatan di jalan raya!</p>
+            <div class="pause-tips">
+              "Selalu tengok kanan, kiri, dan kanan lagi sebelum menyeberang!"
+            </div>
+            <div class="pause-actions">
+              <button id="btn-resume" class="btn btn-primary">
+                ▶ LANJUTKAN (RESUME)
+              </button>
+              <button id="btn-restart-level" class="btn btn-secondary">
+                🔄 ULANGI LEVEL INI
+              </button>
+              <button id="btn-pause-home" class="btn btn-tertiary">
+                🏠 MENU UTAMA
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Level Completed Screen -->
+        <div id="screen-level-complete" class="overlay-screen hidden">
+          <div class="summary-card">
+            <div class="summary-badge">LEVEL SELESAI! 🎉</div>
+            <h2 id="complete-level-title">Level 1 Berhasil Dilewati!</h2>
+            
+            <div class="stats-row">
+              <div class="stat-pill">
+                <span class="stat-label">Skor Level</span>
+                <span id="complete-level-score" class="stat-val">+100</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-label">Bonus Tanpa Tabrakan</span>
+                <span id="complete-bonus-score" class="stat-val">+50</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-label">Total Skor</span>
+                <span id="complete-total-score" class="stat-val">150</span>
+              </div>
+            </div>
+
+            <div class="edu-message-box">
+              <span class="edu-tip-icon">🌟</span>
+              <p id="complete-edu-tip">"Bagus sekali! Kamu sudah belajar menyeberang di zebra crossing dengan tertib."</p>
+            </div>
+
+            <div class="summary-actions">
+              <button id="btn-next-level" class="btn btn-primary btn-large">
+                LANJUT KE LEVEL BERIKUTNYA ➔
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Game Over Screen -->
+        <div id="screen-game-over" class="overlay-screen hidden">
+          <div class="summary-card failure">
+            <div class="summary-badge fail">GAME OVER 💥</div>
+            <h2>Kamu Kehabisan Nyawa!</h2>
+            <p class="summary-desc">Jangan menyerah! Keselamatan di jalan raya membutuhkan kesabaran dan kehati-hatian.</p>
+
+            <div class="stats-row">
+              <div class="stat-pill">
+                <span class="stat-label">Level Terakhir</span>
+                <span id="fail-level" class="stat-val">Level 1</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-label">Skor Akhir</span>
+                <span id="fail-score" class="stat-val">0</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-label">Skor Tertinggi</span>
+                <span id="fail-high-score" class="stat-val">0</span>
+              </div>
+            </div>
+
+            <div class="edu-message-box fail">
+              <span class="edu-tip-icon">⚠️</span>
+              <p id="fail-edu-tip">"Ingat: Jangan terburu-buru menyeberang. Selalu tunggu lampu pejalan kaki hijau dan pastikan kendaraan benar-benar berhenti."</p>
+            </div>
+
+            <div class="summary-actions">
+              <button id="btn-retry" class="btn btn-primary">
+                🔄 MAIN LAGI (RESTART)
+              </button>
+              <button id="btn-fail-home" class="btn btn-secondary">
+                🏠 MENU UTAMA
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Victory Screen (Menang Akhir) -->
+        <div id="screen-victory" class="overlay-screen hidden">
+          <div class="summary-card victory">
+            <div class="trophy-icon">🏆</div>
+            <h1 class="victory-title">YOU ARE A TRAFFIC HERO!</h1>
+            <p class="victory-subtitle">Luar Biasa! Kamu berhasil melewati semua tantangan lalu lintas dengan selamat!</p>
+
+            <div class="stars-container" id="victory-stars">
+              <span class="star active">★</span>
+              <span class="star active">★</span>
+              <span class="star active">★</span>
+            </div>
+
+            <div class="stats-row">
+              <div class="stat-pill">
+                <span class="stat-label">Skor Akhir</span>
+                <span id="victory-score" class="stat-val">0</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-label">Sisa Nyawa</span>
+                <span id="victory-lives" class="stat-val">3 / 3</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-label">Gelar Juara</span>
+                <span class="stat-val text-gold">Duta Tertib Lalu Lintas</span>
+              </div>
+            </div>
+
+            <div class="edu-message-box victory">
+              <span class="edu-tip-icon">🎖️</span>
+              <p>"Pesan Utama: Jadilah pejalan kaki yang cerdas dan teladan. Selalu gunakan trotoar, menyeberang di zebra crossing, dan patuhi rambu lalu lintas di mana pun kamu berada!"</p>
+            </div>
+
+            <div class="summary-actions">
+              <button id="btn-play-again" class="btn btn-primary btn-large">
+                🎉 PLAY AGAIN
+              </button>
+              <button id="btn-victory-home" class="btn btn-secondary">
+                🏠 MENU UTAMA
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Control Help Bar at Bottom -->
+      <footer id="game-footer">
+        <div class="controls-hint">
+          <span>Gunakan <strong>[↑] [↓] [←] [→]</strong> atau <strong>[W] [A] [S] [D]</strong> untuk bergerak</span>
+          <span class="divider">•</span>
+          <span>Tekan <strong>[P]</strong> untuk Jeda</span>
+        </div>
+        <div class="safety-motto">
+          "Keselamatan adalah Prioritas Nomor Satu!"
+        </div>
+      </footer>
+    </div>
+
+    <!-- Main Game Script -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
